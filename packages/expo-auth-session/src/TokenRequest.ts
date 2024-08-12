@@ -161,6 +161,7 @@ export class TokenRequest<T extends TokenRequestConfig> extends Request<T, Token
   readonly clientSecret?: string;
   readonly scopes?: string[];
   readonly extraParams?: Record<string, string>;
+  readonly extraHeaders?: Record<string, string>;
 
   constructor(
     request,
@@ -171,6 +172,7 @@ export class TokenRequest<T extends TokenRequestConfig> extends Request<T, Token
     this.clientSecret = request.clientSecret;
     this.extraParams = request.extraParams;
     this.scopes = request.scopes;
+    this.extraHeaders = request.extraHeaders;
   }
 
   getHeaders(): Headers {
@@ -183,6 +185,14 @@ export class TokenRequest<T extends TokenRequestConfig> extends Request<T, Token
       const credentials = `${encodedClientId}:${encodedClientSecret}`;
       const basicAuth = Base64.encodeNoWrap(credentials);
       headers.Authorization = `Basic ${basicAuth}`;
+    }
+
+    if (this.extraHeaders) {
+      for (const extraHeader in this.extraHeaders) {
+        if (extraHeader in this.extraHeaders) {
+          headers[extraHeader] = this.extraHeaders[extraHeader];
+        }
+      }
     }
 
     return headers;
